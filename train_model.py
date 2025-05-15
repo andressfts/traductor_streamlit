@@ -53,7 +53,9 @@ trainer = Seq2SeqTrainer(
 trainer.train()
 
 # 8. Guardar solo el modelo final
+model.to("cpu")  # 🔁 Importante: pasar a CPU antes de guardar
 model.save_pretrained("./modelo_personalizado")
 tokenizer.save_pretrained("./modelo_personalizado")
+
 
 print("✅ Entrenamiento completo y modelo guardado en './modelo_personalizado'")
