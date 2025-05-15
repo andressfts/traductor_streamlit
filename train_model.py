@@ -53,7 +53,7 @@ trainer = Seq2SeqTrainer(
 trainer.train()
 
 # 8. Guardar solo el modelo final
-model.save_pretrained("./modelo_personalizado")
+model.save_pretrained("./modelo_personalizado", safe_serialization=False)
 tokenizer.save_pretrained("./modelo_personalizado")
 
 print("✅ Entrenamiento completo y modelo guardado en './modelo_personalizado'")
