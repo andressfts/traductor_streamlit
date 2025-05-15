@@ -8,7 +8,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Cargar modelo y tokenizer
 model_path = "./modelo_personalizado"
 tokenizer = MarianTokenizer.from_pretrained("Helsinki-NLP/opus-mt-es-en")
-model = MarianMTModel.from_pretrained(model_path).to(device)
+model = MarianMTModel.from_pretrained(model_path)
 
 # Título de la app
 st.title("Traductor Personalizado Español → Inglés")
