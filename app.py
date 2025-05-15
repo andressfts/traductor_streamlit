@@ -1,14 +1,17 @@
+import os
 import streamlit as st
 import torch
 from transformers import MarianTokenizer, MarianMTModel
 
-# Usar CPU
-device = torch.device("cpu")
+# (opcional) Prevenir fallos en compilación con tensores meta
+os.environ["TORCH_COMPILE_UNSUPPORTED_DEVICE_FALLBACK"] = "1"
 
-# Cargar modelo y tokenizer
+# Ruta del modelo entrenado
 model_path = "./modelo_personalizado"
+
+# Cargar tokenizer y modelo (todo en CPU, sin .to(device))
 tokenizer = MarianTokenizer.from_pretrained(model_path)
-model = MarianMTModel.from_pretrained(model_path).to(device)
+model = MarianMTModel.from_pretrained(model_path)
 
 # Título
 st.title("Traductor Personalizado Español → Inglés")
@@ -22,8 +25,7 @@ if st.button("Traducir"):
     if texto.strip():
         with st.spinner("Traduciendo..."):
             tokens = tokenizer(texto, return_tensors="pt", padding=True)
-            # Asegurar que todo esté en CPU
-            tokens = {k: v.to(device) for k, v in tokens.items()}
+            tokens = {k: v for k, v in tokens.items()}  # 🔁 No mover a otro device
             traduccion_ids = model.generate(**tokens)
             traduccion = tokenizer.decode(traduccion_ids[0], skip_special_tokens=True)
             st.success("✅ Traducción completada")
