@@ -1,14 +1,17 @@
-import streamlit as st
 import torch
 from transformers import MarianTokenizer, MarianMTModel
+import streamlit as st
 
-# Detectar dispositivo
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# Dispositivo (solo CPU en Streamlit Cloud)
+device = torch.device("cpu")
 
-# Cargar modelo y tokenizer
+# Ruta al modelo personalizado guardado en el mismo repositorio
 model_path = "./modelo_personalizado"
-tokenizer = MarianTokenizer.from_pretrained("Helsinki-NLP/opus-mt-es-en")
+
+# Cargar tokenizer y modelo desde esa carpeta
+tokenizer = MarianTokenizer.from_pretrained(model_path)
 model = MarianMTModel.from_pretrained(model_path).to(device)
+
 
 # Interfaz Streamlit
 st.title("Traductor Personalizado Español → Inglés")
