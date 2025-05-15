@@ -8,7 +8,7 @@ device = torch.device("cpu")
 # Cargar modelo y tokenizer
 model_path = "./modelo_personalizado"
 tokenizer = MarianTokenizer.from_pretrained(model_path)
-model = MarianMTModel.from_pretrained(model_path).to(device)
+model = MarianMTModel.from_pretrained(model_path)
 
 # Título de la app
 st.title("Traductor Personalizado Español → Inglés")
