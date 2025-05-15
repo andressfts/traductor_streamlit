@@ -22,11 +22,11 @@ if st.button("Traducir"):
     if texto.strip():
         with st.spinner("Traduciendo..."):
             tokens = tokenizer(texto, return_tensors="pt", padding=True)
-            # Todos los tensores al mismo dispositivo que el modelo
             tokens = {k: v.to(model.device) for k, v in tokens.items()}
-            traduccion_ids = model.generate(**tokens)
+            traduccion_ids = model.generate(**tokens, device=model.device)  # 👈 clave
             traduccion = tokenizer.decode(traduccion_ids[0], skip_special_tokens=True)
             st.success("✅ Traducción completada")
             st.text_area("Traducción:", traduccion, height=100)
+
     else:
         st.warning("Por favor ingresa un texto.")
