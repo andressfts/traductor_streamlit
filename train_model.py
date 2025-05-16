@@ -11,7 +11,7 @@ tokenizer = MarianTokenizer.from_pretrained(model_name)
 model = MarianMTModel.from_pretrained(model_name)
 
 # 3. Datos personalizados de entrenamiento
-frases_adicionales = [
+data = [
     {"src": "Hola", "tgt": "Hello"},
     {"src": "Adiós", "tgt": "Goodbye"},
     {"src": "Por favor", "tgt": "Please"},
@@ -34,10 +34,10 @@ frases_adicionales = [
     {"src": "¿Hablas español?", "tgt": "Do you speak Spanish?"},
     {"src": "Estoy aprendiendo inglés", "tgt": "I am learning English"},
     {"src": "¿Cuál es tu nombre?", "tgt": "What is your name?"},
-    {"src": "Mi nombre es Ana", "tgt": "My name is Ana"},
+    {"src": "Mi nombre es", "tgt": "My name is"},
     {"src": "Encantado de conocerte", "tgt": "Nice to meet you"},
     {"src": "¿Dónde vives?", "tgt": "Where do you live?"},
-    {"src": "Vivo en Colombia", "tgt": "I live in Colombia"},
+    {"src": "Vivo en ", "tgt": "I live in "},
     {"src": "¿Qué haces?", "tgt": "What do you do?"},
     {"src": "Soy estudiante", "tgt": "I am a student"},
     {"src": "Estoy trabajando", "tgt": "I am working"},
