@@ -35,10 +35,12 @@ training_args = Seq2SeqTrainingArguments(
     output_dir="./modelo_personalizado",
     per_device_train_batch_size=2,
     num_train_epochs=10,
-    save_strategy="no",  # ❌ No guardar checkpoints intermedios
+    save_strategy="epoch",
+    save_total_limit=1,         # ✅ Guarda solo el checkpoint final
     logging_dir="./logs",
     logging_steps=10,
-    report_to="none",  # ❌ No usar wandb, tensorboard, etc.
+    evaluation_strategy="no",
+    report_to="none"
 )
 
 # 6. Entrenador
@@ -53,6 +55,7 @@ trainer = Seq2SeqTrainer(
 trainer.train()
 
 # 8. Guardar solo el modelo final
+model.cpu()
 model.save_pretrained("./modelo_personalizado")
 tokenizer.save_pretrained("./modelo_personalizado")
 
