@@ -1,5 +1,6 @@
 streamlit
-torch
 transformers
+torch
+sentencepiece
+protobuf
 datasets
-
