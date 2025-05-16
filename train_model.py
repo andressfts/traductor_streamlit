@@ -11,12 +11,57 @@ tokenizer = MarianTokenizer.from_pretrained(model_name)
 model = MarianMTModel.from_pretrained(model_name)
 
 # 3. Datos personalizados de entrenamiento
-data = [
-    {"src": "traduccion", "tgt": "translation"},
-    {"src": "Buenos días", "tgt": "Good morning"},
-    {"src": "¿Cómo te llamas?", "tgt": "What is your name?"},
+frases_adicionales = [
+    {"src": "Hola", "tgt": "Hello"},
+    {"src": "Adiós", "tgt": "Goodbye"},
+    {"src": "Por favor", "tgt": "Please"},
+    {"src": "Gracias", "tgt": "Thank you"},
+    {"src": "Lo siento", "tgt": "Sorry"},
+    {"src": "Sí", "tgt": "Yes"},
+    {"src": "No", "tgt": "No"},
+    {"src": "¿Qué hora es?", "tgt": "What time is it?"},
+    {"src": "¿Dónde está el baño?", "tgt": "Where is the bathroom?"},
+    {"src": "¿Cuánto cuesta?", "tgt": "How much does it cost?"},
+    {"src": "No entiendo", "tgt": "I don't understand"},
+    {"src": "¿Puedes ayudarme?", "tgt": "Can you help me?"},
+    {"src": "Estoy perdido", "tgt": "I am lost"},
+    {"src": "Estoy bien", "tgt": "I am fine"},
+    {"src": "Tengo hambre", "tgt": "I am hungry"},
+    {"src": "Tengo sed", "tgt": "I am thirsty"},
+    {"src": "Estoy cansado", "tgt": "I am tired"},
+    {"src": "Me gusta", "tgt": "I like it"},
+    {"src": "No me gusta", "tgt": "I don’t like it"},
+    {"src": "¿Hablas español?", "tgt": "Do you speak Spanish?"},
     {"src": "Estoy aprendiendo inglés", "tgt": "I am learning English"},
-    {"src": "¿Dónde está el hospital?", "tgt": "Where is the hospital?"},
+    {"src": "¿Cuál es tu nombre?", "tgt": "What is your name?"},
+    {"src": "Mi nombre es Ana", "tgt": "My name is Ana"},
+    {"src": "Encantado de conocerte", "tgt": "Nice to meet you"},
+    {"src": "¿Dónde vives?", "tgt": "Where do you live?"},
+    {"src": "Vivo en Colombia", "tgt": "I live in Colombia"},
+    {"src": "¿Qué haces?", "tgt": "What do you do?"},
+    {"src": "Soy estudiante", "tgt": "I am a student"},
+    {"src": "Estoy trabajando", "tgt": "I am working"},
+    {"src": "Feliz cumpleaños", "tgt": "Happy birthday"},
+    {"src": "Feliz Navidad", "tgt": "Merry Christmas"},
+    {"src": "Feliz año nuevo", "tgt": "Happy new year"},
+    {"src": "Buen provecho", "tgt": "Enjoy your meal"},
+    {"src": "Salud", "tgt": "Bless you"},
+    {"src": "Cuidado", "tgt": "Watch out"},
+    {"src": "Bien hecho", "tgt": "Well done"},
+    {"src": "Buena suerte", "tgt": "Good luck"},
+    {"src": "Vamos", "tgt": "Let’s go"},
+    {"src": "Espera", "tgt": "Wait"},
+    {"src": "Detente", "tgt": "Stop"},
+    {"src": "Ven aquí", "tgt": "Come here"},
+    {"src": "Estoy en casa", "tgt": "I am home"},
+    {"src": "¿Dónde estás?", "tgt": "Where are you?"},
+    {"src": "Estoy en el trabajo", "tgt": "I am at work"},
+    {"src": "Tengo una pregunta", "tgt": "I have a question"},
+    {"src": "Hace calor", "tgt": "It is hot"},
+    {"src": "Hace frío", "tgt": "It is cold"},
+    {"src": "Está lloviendo", "tgt": "It is raining"},
+    {"src": "Está soleado", "tgt": "It is sunny"},
+    {"src": "Estoy enfermo", "tgt": "I am sick"},
 ]
 
 dataset = Dataset.from_list(data)
@@ -35,12 +80,11 @@ training_args = Seq2SeqTrainingArguments(
     output_dir="./modelo_personalizado",
     per_device_train_batch_size=2,
     num_train_epochs=10,
-    save_strategy="no",        # ✅ No guarda checkpoints intermedios
+    save_strategy="no",  # ❌ No guardar checkpoints intermedios
     logging_dir="./logs",
     logging_steps=10,
-    report_to="none"
+    report_to="none",  # ❌ No usar wandb, tensorboard, etc.
 )
-
 
 # 6. Entrenador
 trainer = Seq2SeqTrainer(
@@ -54,7 +98,6 @@ trainer = Seq2SeqTrainer(
 trainer.train()
 
 # 8. Guardar solo el modelo final
-model.cpu()
 model.save_pretrained("./modelo_personalizado")
 tokenizer.save_pretrained("./modelo_personalizado")
 
