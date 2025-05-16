@@ -2,17 +2,19 @@ import streamlit as st
 import torch
 from transformers import MarianTokenizer, MarianMTModel
 
-# Forzar CPU (Streamlit Cloud no soporta GPU)
+# Siempre CPU en Streamlit Cloud
 device = torch.device("cpu")
 
-# Carga cacheada del modelo para evitar relentización
-@st.cache_resource
-def cargar_modelo():
-    tokenizer = MarianTokenizer.from_pretrained("Helsinki-NLP/opus-mt-es-en")
-    model = MarianMTModel.from_pretrained("./modelo_personalizado").to(device)
-    return tokenizer, model
+# ⚠️ No usar @st.cache_resource aquí directamente por problemas con torch
+@st.cache_data(show_spinner=False)
+def get_model_paths():
+    return "Helsinki-NLP/opus-mt-es-en", "./modelo_personalizado"
 
-tokenizer, model = cargar_modelo()
+tokenizer_path, model_path = get_model_paths()
+
+# Cargar modelo sin cachearlo
+tokenizer = MarianTokenizer.from_pretrained(tokenizer_path)
+model = MarianMTModel.from_pretrained(model_path).to(device)
 
 # Interfaz
 st.title("Traductor Personalizado Español → Inglés")
