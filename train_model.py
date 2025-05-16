@@ -2,7 +2,7 @@ from datasets import Dataset
 from transformers import MarianTokenizer, MarianMTModel, Seq2SeqTrainer, Seq2SeqTrainingArguments
 import os
 
-# 1. Desactivar wandb y advertencias innecesarias
+# 1. Desactivar wandb
 os.environ["WANDB_DISABLED"] = "true"
 
 # 2. Cargar modelo base y tokenizer
@@ -67,25 +67,27 @@ dataset = Dataset.from_list(data)
 
 # 4. Preprocesamiento del dataset
 def preprocess(example):
-    inputs = tokenizer(example["src"], truncation=True, padding="max_length", max_length=40)
-    targets = tokenizer(example["tgt"], truncation=True, padding="max_length", max_length=40)
-    inputs["labels"] = targets["input_ids"]
-    return inputs
+    model_inputs = tokenizer(example["src"], max_length=40, truncation=True, padding="max_length")
+    with tokenizer.as_target_tokenizer():
+        labels = tokenizer(example["tgt"], max_length=40, truncation=True, padding="max_length")
+    model_inputs["labels"] = labels["input_ids"]
+    return model_inputs
 
 dataset = dataset.map(preprocess)
 
-# 5. Configuración del entrenamiento sin checkpoints intermedios
+# 5. Configuración del entrenamiento
 training_args = Seq2SeqTrainingArguments(
     output_dir="./modelo_personalizado",
     per_device_train_batch_size=2,
     num_train_epochs=10,
-    save_strategy="no",  # ❌ No guardar checkpoints intermedios
+    save_strategy="epoch",         # ✅ Guarda al final de cada época
     logging_dir="./logs",
     logging_steps=10,
-    report_to="none",  # ❌ No usar wandb, tensorboard, etc.
+    evaluation_strategy="no",
+    report_to="none"
 )
 
-# 6. Entrenador
+# 6. Crear entrenador
 trainer = Seq2SeqTrainer(
     model=model,
     args=training_args,
@@ -93,11 +95,11 @@ trainer = Seq2SeqTrainer(
     tokenizer=tokenizer,
 )
 
-# 7. Entrenar
+# 7. Entrenar modelo
 trainer.train()
 
-# 8. Guardar solo el modelo final
-model.cpu()  # ✅ Fuerza el modelo a CPU antes de guardarlo
+# 8. Guardar modelo entrenado en CPU
+model.cpu()
 model.save_pretrained("./modelo_personalizado")
 tokenizer.save_pretrained("./modelo_personalizado")
 
