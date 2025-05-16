@@ -35,13 +35,12 @@ training_args = Seq2SeqTrainingArguments(
     output_dir="./modelo_personalizado",
     per_device_train_batch_size=2,
     num_train_epochs=10,
-    save_strategy="epoch",
-    save_total_limit=1,         # ✅ Guarda solo el checkpoint final
+    save_strategy="no",        # ✅ No guarda checkpoints intermedios
     logging_dir="./logs",
     logging_steps=10,
-    evaluation_strategy="no",
     report_to="none"
 )
+
 
 # 6. Entrenador
 trainer = Seq2SeqTrainer(
