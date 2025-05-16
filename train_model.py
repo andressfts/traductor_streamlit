@@ -2,7 +2,7 @@ from datasets import Dataset
 from transformers import MarianTokenizer, MarianMTModel, Seq2SeqTrainer, Seq2SeqTrainingArguments
 import os
 
-# 1. Desactivar wandb
+# 1. Desactivar wandb y advertencias innecesarias
 os.environ["WANDB_DISABLED"] = "true"
 
 # 2. Cargar modelo base y tokenizer
@@ -12,66 +12,36 @@ model = MarianMTModel.from_pretrained(model_name)
 
 # 3. Datos personalizados de entrenamiento
 data = [
+    {"src": "traduccion", "tgt": "translation"},
     {"src": "Buenos días", "tgt": "Good morning"},
-    {"src": "Buenas noches", "tgt": "Good night"},
-    {"src": "¿Cómo estás?", "tgt": "How are you?"},
-    {"src": "Estoy bien", "tgt": "I'm fine"},
-    {"src": "Muchas gracias", "tgt": "Thank you very much"},
-    {"src": "De nada", "tgt": "You're welcome"},
-    {"src": "¿Qué hora es?", "tgt": "What time is it?"},
-    {"src": "Encantado de conocerte", "tgt": "Nice to meet you"},
-    {"src": "¿Hablas inglés?", "tgt": "Do you speak English?"},
-    {"src": "Hace calor", "tgt": "It's hot"},
-    {"src": "Hace frío", "tgt": "It's cold"},
-    {"src": "Está lloviendo", "tgt": "It's raining"},
-    {"src": "Me gusta", "tgt": "I like it"},
-    {"src": "No me gusta", "tgt": "I don't like it"},
-    {"src": "Sí", "tgt": "Yes"},
-    {"src": "No", "tgt": "No"},
-    {"src": "Tal vez", "tgt": "Maybe"},
-    {"src": "Hoy", "tgt": "Today"},
-    {"src": "Mañana", "tgt": "Tomorrow"},
-    {"src": "Ayer", "tgt": "Yesterday"},
-    {"src": "Trabajo", "tgt": "Work"},
-    {"src": "Escuela", "tgt": "School"},
-    {"src": "Universidad", "tgt": "University"},
-    {"src": "Amigo", "tgt": "Friend"},
-    {"src": "Familia", "tgt": "Family"},
-    {"src": "Casa", "tgt": "House"},
-    {"src": "Comida", "tgt": "Food"},
-    {"src": "Coche", "tgt": "Car"},
-    {"src": "Tren", "tgt": "Train"},
-    {"src": "Avión", "tgt": "Plane"},
-    {"src": "Aeropuerto", "tgt": "Airport"},
-    {"src": "Pasaporte", "tgt": "Passport"},
-    {"src": "Maleta", "tgt": "Suitcase"}
+    {"src": "¿Cómo te llamas?", "tgt": "What is your name?"},
+    {"src": "Estoy aprendiendo inglés", "tgt": "I am learning English"},
+    {"src": "¿Dónde está el hospital?", "tgt": "Where is the hospital?"},
 ]
 
 dataset = Dataset.from_list(data)
 
 # 4. Preprocesamiento del dataset
 def preprocess(example):
-    model_inputs = tokenizer(example["src"], max_length=40, truncation=True, padding="max_length")
-    with tokenizer.as_target_tokenizer():
-        labels = tokenizer(example["tgt"], max_length=40, truncation=True, padding="max_length")
-    model_inputs["labels"] = labels["input_ids"]
-    return model_inputs
+    inputs = tokenizer(example["src"], truncation=True, padding="max_length", max_length=40)
+    targets = tokenizer(example["tgt"], truncation=True, padding="max_length", max_length=40)
+    inputs["labels"] = targets["input_ids"]
+    return inputs
 
 dataset = dataset.map(preprocess)
 
-# 5. Configuración del entrenamiento
+# 5. Configuración del entrenamiento sin checkpoints intermedios
 training_args = Seq2SeqTrainingArguments(
     output_dir="./modelo_personalizado",
     per_device_train_batch_size=2,
     num_train_epochs=10,
-    save_strategy="epoch",         # ✅ Guarda al final de cada época
+    save_strategy="no",  # ❌ No guardar checkpoints intermedios
     logging_dir="./logs",
     logging_steps=10,
-    evaluation_strategy="no",
-    report_to="none"
+    report_to="none",  # ❌ No usar wandb, tensorboard, etc.
 )
 
-# 6. Crear entrenador
+# 6. Entrenador
 trainer = Seq2SeqTrainer(
     model=model,
     args=training_args,
@@ -79,11 +49,10 @@ trainer = Seq2SeqTrainer(
     tokenizer=tokenizer,
 )
 
-# 7. Entrenar modelo
+# 7. Entrenar
 trainer.train()
 
-# 8. Guardar modelo entrenado en CPU
-model.cpu()
+# 8. Guardar solo el modelo final
 model.save_pretrained("./modelo_personalizado")
 tokenizer.save_pretrained("./modelo_personalizado")
 
