@@ -2,8 +2,8 @@ import streamlit as st
 import torch
 from transformers import MarianTokenizer, MarianMTModel
 
-# Detectar dispositivo (CPU forzado en Streamlit Cloud)
-device = torch.device("cpu")
+# Detectar dispositivo
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Cargar modelo y tokenizer
 model_path = "./modelo_personalizado"
@@ -19,14 +19,9 @@ texto = st.text_area("Escribe en español:", "Buenos días")
 if st.button("Traducir"):
     if texto.strip():
         with st.spinner("Traduciendo..."):
-            # Tokenización
-            tokens = tokenizer(texto, return_tensors="pt", padding=True, truncation=True)
-            # Enviar cada tensor al dispositivo
-            tokens = {k: v.to(device) for k, v in tokens.items()}
-            # Generar traducción
+            tokens = tokenizer(texto, return_tensors="pt", padding=True).to(device)
             traduccion_ids = model.generate(**tokens)
             traduccion = tokenizer.decode(traduccion_ids[0], skip_special_tokens=True)
-            # Mostrar resultado
             st.success("✅ Traducción completada")
             st.text_area("Traducción:", traduccion, height=100)
     else:
