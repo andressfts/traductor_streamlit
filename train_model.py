@@ -97,6 +97,7 @@ trainer = Seq2SeqTrainer(
 trainer.train()
 
 # 8. Guardar solo el modelo final
+model.cpu()  # ✅ Fuerza el modelo a CPU antes de guardarlo
 model.save_pretrained("./modelo_personalizado")
 tokenizer.save_pretrained("./modelo_personalizado")
 
